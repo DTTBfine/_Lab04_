@@ -48,7 +48,58 @@ def build_chat_model(
             base_url=os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"),
             temperature=temperature,
         )
-    raise ValueError("This lab supports only the `google` and `ollama` providers.")
+    if provider == "mimo":
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("MIMO_API_KEY")
+        base_url = os.getenv("MIMO_BASE_URL", "https://token-plan-cn.xiaomimimo.com/v1")
+
+        if not api_key:
+            raise ValueError("Missing MIMO_API_KEY in .env")
+
+        return ChatOpenAI(
+            model=model_name or os.getenv("MIMO_MODEL", "mimo-v2.5-pro"),
+            api_key=api_key,
+            base_url=base_url,
+            temperature=temperature,
+        )
+    if provider == "openrouter":
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=model_name or os.getenv("OPENROUTER_MODEL", "openai/gpt-4o-mini"),
+            api_key=os.getenv("OPENROUTER_API_KEY"),
+            base_url=os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1"),
+            temperature=temperature,
+            default_headers={
+                "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", "http://localhost"),
+                "X-Title": os.getenv("OPENROUTER_APP_NAME", "Lab4"),
+            },
+        )
+    
+    if provider == "openai":
+        from langchain_openai import ChatOpenAI
+
+        api_key = os.getenv("OPENAI_API_KEY")
+        if not api_key:
+            raise ValueError("Missing OPENAI_API_KEY in .env")
+
+        return ChatOpenAI(
+            model=model_name or os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+            api_key=api_key,
+            temperature=temperature,
+        )
+    if provider == "custom":   #src/core/llm.py line: 51
+        from langchain_openai import ChatOpenAI
+
+        return ChatOpenAI(
+            model=model_name or os.getenv("CUSTOM_LLM_MODEL"),
+            openai_api_key=os.getenv("CUSTOM_LLM_KEY"),
+            openai_api_base=os.getenv("CUSTOM_LLM_URL"),
+            temperature=temperature,
+        )
+    
+    raise ValueError("This lab supports only the `google`, `ollama`, `mimo`, `openrouter`, and `openai` providers.")
 
 
 def extract_json_object(raw: Any) -> dict[str, Any]:

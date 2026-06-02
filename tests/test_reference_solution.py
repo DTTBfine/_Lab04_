@@ -8,9 +8,9 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from solution.agent.graph import run_agent
-import solution.agent.graph as solution_graph
-from solution.utils.data_store import OrderDataStore
+from src.agent.graph import run_agent
+import src.agent.graph as solution_graph
+from src.utils.data_store import OrderDataStore
 from src.core.schemas import OrderLineInput
 
 
